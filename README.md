@@ -1,6 +1,6 @@
 # FreeToken
 
-一个基于 Go 的**多账号 AI 模型聚合网关**——聚合多个日日新账号的免费 Token，对外提供统一的 OpenAI 兼容 API。
+一个基于 Go 的**多账号 AI 模型聚合网关**——聚合多个上游账号的免费 Token，对外提供统一的 OpenAI 兼容 API。
 
 自动在账号间负载均衡、自动熔断限流，让你在本地就能拥有源源不断的免费 AI 调用能力。
 
@@ -10,7 +10,7 @@
 
 | 功能 | 说明 |
 |------|------|
-| **多账号聚合** | 把多个日日新账号的免费 Token 合并为一个池子，自动轮询调用 |
+| **多账号聚合** | 把多个上游账号的免费 Token 合并为一个池子，自动轮询调用 |
 | **OpenAI 兼容 API** | 对外暴露 `/v1/chat/completions`、`/v1/images/generations`、`/v1/models`，与所有主流 AI 工具链无缝对接 |
 | **负载均衡** | 多账号自动轮换，遇到限流自动切换到其他账号，实现高可用 |
 | **熔断机制** | 某账号触发 429 / 错误时自动冷却，冷却后自动恢复，避免雪崩 |
@@ -28,9 +28,9 @@
 | deepseek-v4-pro | 文本 | ¥9 / ¥27 |
 | glm-5.2 | 文本 | ¥8 / ¥28 |
 | kimi-k3 | 文本 | ¥20 / ¥100 |
-| sensenova-6.8-flash-lite | 文本 | ¥5 / ¥30 |
-| sensenova-u1-fast | 图片 | — |
-| sensenova-u1.5-lite | 图片 | — |
+| 6.8-flash-lite | 文本 | ¥5 / ¥30 |
+| u1-fast | 图片 | — |
+| u1.5-lite | 图片 | — |
 
 > 价格来源：各模型官网定价，用于"省钱金额"估算。可在 `config.json` 中自定义修改。
 
@@ -39,12 +39,12 @@
 ### 前提
 
 - [Go 1.21+](https://go.dev/dl/)（仅编译时需要）
-- 若干日日新 API Key（每个账号一个，可在 [日日新开放平台](https://token.sensenova.cn) 注册获取）
+- 若干上游平台 API Key（每个账号一个，可在模型开放平台注册获取，需替换为你的上游地址）
 
 ### 1. 编译
 
 ```bash
-go build -o sensenova-gateway.exe .
+go build -o freetoken-gateway.exe .
 ```
 
 ### 2. 配置
@@ -60,7 +60,7 @@ copy config.example.json config.json
 ```json
 {
   "listen": "127.0.0.1:18888",
-  "upstream_base": "https://token.sensenova.cn/v1",
+  "upstream_base": "https://api.example.com/v1",
   "timeout_seconds": 30,
   "cooldown_seconds": 300,
   "cooldown_429_seconds": 600,
@@ -71,14 +71,14 @@ copy config.example.json config.json
     "glm-5.2",
     "deepseek-v4-pro",
     "kimi-k3",
-    "sensenova-6.8-flash-lite"
+    "6.8-flash-lite"
   ],
   "model_prices": {
     "deepseek-v4-flash": { "input": 3, "output": 9 },
     "deepseek-v4-pro": { "input": 9, "output": 27 },
     "glm-5.2": { "input": 8, "output": 28 },
     "kimi-k3": { "input": 20, "output": 100 },
-    "sensenova-6.8-flash-lite": { "input": 5, "output": 30 }
+    "6.8-flash-lite": { "input": 5, "output": 30 }
   },
   "accounts": [
     {
@@ -115,10 +115,10 @@ copy config.example.json config.json
 
 ```bash
 # 直接启动（前台，方便看日志）
-./sensenova-gateway.exe
+./freetoken-gateway.exe
 
 # 或使用配置文件指定路径
-./sensenova-gateway.exe -config config.json
+./freetoken-gateway.exe -config config.json
 
 # Windows 后台静默启动（开机自启/挂机场景）
 # 双击 start_hidden.vbs 即可
@@ -204,7 +204,7 @@ for await (const chunk of stream) {
 
 ```
 ┌──────────┐      ┌──────────────────┐      ┌──────────────┐
-│  你的应用  │ ──► │   FreeToken 网关  │ ──► │  日日新 API   │
+│  你的应用  │ ──► │   FreeToken 网关  │ ──► │  上游 API   │
 │          │ ◄── │                  │ ◄── │              │
 └──────────┘      └──────────────────┘      └──────────────┘
                         │
@@ -219,7 +219,7 @@ for await (const chunk of stream) {
 
 1. 你的应用发起 OpenAI 格式请求到网关
 2. 网关从账号池中选取一个**健康**的账号（自动跳过冷却中的）
-3. 将请求转发到上游日日新 API，使用选中账号的真实 API Key
+3. 将请求转发到上游 API，使用选中账号的真实 API Key
 4. 返回结果给应用，同时记录 token 用量用于省钱统计
 5. 若请求失败（限流/超时/错误），自动切换下一个账号重试，直到成功或全部冷却
 
@@ -257,7 +257,7 @@ FreeToken/
 
 **Q: API Key 从哪获取？**
 
-A: 在 [日日新开放平台](https://token.sensenova.cn) 注册账号即可获取。每个账号一个 Key，多个账号就可以组成免费 Token 池。
+A: 在模型开放平台注册账号即可获取（替换为你的上游地址）。每个账号一个 Key，多个账号就可以组成免费 Token 池。
 
 **Q: 为什么有的账号显示冷却中？**
 
@@ -277,10 +277,10 @@ A: 可以。Go 代码是跨平台的，编译时指定目标平台即可：
 
 ```bash
 # Linux x64
-GOOS=linux GOARCH=amd64 go build -o sensenova-gateway .
+GOOS=linux GOARCH=amd64 go build -o freetoken-gateway .
 
 # macOS (Apple Silicon)
-GOOS=darwin GOARCH=arm64 go build -o sensenova-gateway .
+GOOS=darwin GOARCH=arm64 go build -o freetoken-gateway .
 ```
 
 VBS 启动脚本仅适用于 Windows。
@@ -302,7 +302,7 @@ VBS 启动脚本仅适用于 Windows。
 ## 免责声明
 
 - 本项目仅供学习和技术研究使用
-- 请遵守日日新开放平台的使用条款和频率限制
+- 请遵守上游平台的使用条款和频率限制
 - 作者不对因使用本项目导致的任何直接或间接损失负责
 - 请在合法合规的前提下合理使用免费 Token 资源
 

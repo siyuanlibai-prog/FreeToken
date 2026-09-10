@@ -1,6 +1,6 @@
 {
   "listen": "127.0.0.1:18888",
-  "upstream_base": "https://token.sensenova.cn/v1",
+  "upstream_base": "https://api.example.com/v1",
   "timeout_seconds": 30,
   "cooldown_seconds": 300,
   "cooldown_429_seconds": 600,
@@ -11,7 +11,7 @@
     "glm-5.2",
     "deepseek-v4-pro",
     "kimi-k3",
-    "sensenova-6.8-flash-lite"
+    "6.8-flash-lite"
   ],
   "model_prices": {
     "deepseek-v4-flash": {
@@ -30,7 +30,7 @@
       "input": 20,
       "output": 100
     },
-    "sensenova-6.8-flash-lite": {
+    "6.8-flash-lite": {
       "input": 5,
       "output": 30
     }
@@ -41,13 +41,13 @@
       "alias": "账号1",
       "api_key": "sk-你的第一个APIKey",
       "models": [
-        "sensenova-6.8-flash-lite",
+        "6.8-flash-lite",
         "deepseek-v4-flash",
         "glm-5.2",
         "kimi-k3",
         "deepseek-v4-pro",
-        "sensenova-u1-fast",
-        "sensenova-u1.5-lite"
+        "u1-fast",
+        "u1.5-lite"
       ],
       "created_at": "2026-01-01T00:00:00+08:00"
     },
@@ -55,13 +55,13 @@
       "alias": "账号2",
       "api_key": "sk-你的第二个APIKey",
       "models": [
-        "sensenova-6.8-flash-lite",
+        "6.8-flash-lite",
         "deepseek-v4-flash",
         "glm-5.2",
         "kimi-k3",
         "deepseek-v4-pro",
-        "sensenova-u1-fast",
-        "sensenova-u1.5-lite"
+        "u1-fast",
+        "u1.5-lite"
       ],
       "created_at": "2026-01-01T00:00:00+08:00"
     }

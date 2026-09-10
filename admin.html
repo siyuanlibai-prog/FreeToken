@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>日日新多账号网关 · 控制台</title>
+<title>多账号 AI 网关 · 控制台</title>
 <style>
   :root {
     --bg: #060a14;
@@ -532,7 +532,7 @@
     <div class="brand">
       <div class="logo">N</div>
       <div class="bt">
-        <h1>日日新多账号网关</h1>
+        <h1>多账号 AI 网关</h1>
         <div class="sub">SenseNova Multi-Key Gateway</div>
       </div>
     </div>
@@ -690,7 +690,7 @@
         <div class="panel-head">全局设置</div>
         <div class="grid">
           <div><label>监听地址</label><input type="text" id="listen" placeholder="127.0.0.1:18888"></div>
-          <div><label>上游地址</label><input type="text" id="upstream_base" placeholder="https://token.sensenova.cn/v1"></div>
+          <div><label>上游地址</label><input type="text" id="upstream_base" placeholder="https://api.example.com/v1"></div>
           <div><label>超时（秒）</label><input type="number" id="timeout_seconds" min="1" value="60"></div>
           <div><label>普通冷却（秒）</label><input type="number" id="cooldown_seconds" min="1" value="60"></div>
           <div><label>429 限流冷却（秒）</label><input type="number" id="cooldown_429_seconds" min="1" value="180"></div>
@@ -804,7 +804,7 @@
 </div>
 
 <script>
-const KNOWN_MODELS = ["sensenova-6.8-flash-lite", "deepseek-v4-flash", "glm-5.2", "kimi-k3", "deepseek-v4-pro", "sensenova-u1-fast", "sensenova-u1.5-lite"];
+const KNOWN_MODELS = ["6.8-flash-lite", "deepseek-v4-flash", "glm-5.2", "kimi-k3", "deepseek-v4-pro", "u1-fast", "u1.5-lite"];
 const DEFAULT_MODELS = ["deepseek-v4-flash"];
 const PAGE_SIZE = 15;
 
@@ -1139,7 +1139,7 @@ function renderStats() {
 /* ===== 信号灯阵列：按模型分类，账号为灯，状态着色 ===== */
 let signalModel = ''; // 当前选中的信号灯模型
 let signalAuto = 0;   // 自动跟随使用中模型的时间戳
-const IMAGE_MODELS = ['sensenova-u1-fast', 'sensenova-u1.5-lite'];
+const IMAGE_MODELS = ['u1-fast', 'u1.5-lite'];
 function renderSignalGrid() {
   const box = document.getElementById('signal-grid');
   const tabs = document.getElementById('signal-tabs');
@@ -1450,7 +1450,7 @@ function addImgSession() {
     '<div class="panel-head">' + esc(s.name) + '</div>' +
     '<div class="ig-param-grid">' +
       '<div class="ig-field"><label>模型</label>' +
-        '<select class="ig-model"><option value="sensenova-u1.5-lite">sensenova-u1.5-lite（推荐，支持任意尺寸）</option><option value="sensenova-u1-fast">sensenova-u1-fast（信息图专用，固定 2K）</option></select>' +
+        '<select class="ig-model"><option value="u1.5-lite">u1.5-lite（推荐，支持任意尺寸）</option><option value="u1-fast">u1-fast（信息图专用，固定 2K）</option></select>' +
       '</div>' +
       '<div class="ig-field"><label>尺寸</label>' +
         '<select class="ig-size">' + IMAGE_SIZES_LITE.map(s2 => '<option value="' + s2 + '">' + (IMG_SIZE_LABELS[s2] || s2) + '</option>').join('') + '</select>' +
@@ -1473,7 +1473,7 @@ function addImgSession() {
   const modelSel = div.querySelector('.ig-model');
   const sizeSel = div.querySelector('.ig-size');
   modelSel.addEventListener('change', function() {
-    const isFast = this.value === 'sensenova-u1-fast';
+    const isFast = this.value === 'u1-fast';
     const list = isFast ? IMAGE_SIZES_FAST : IMAGE_SIZES_LITE;
     const cur = sizeSel.value;
     sizeSel.innerHTML = list.map(s2 => '<option value="' + s2 + '">' + (IMG_SIZE_LABELS[s2] || s2) + '</option>').join('');

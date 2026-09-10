@@ -11,8 +11,8 @@ restart.log
 images/
 
 # ── 编译产物 ──
-sensenova-gateway.exe
-sensenova-gateway
+freetoken-gateway.exe
+freetoken-gateway
 *.exe~
 *.test
 *.out

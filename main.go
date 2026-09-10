@@ -362,7 +362,7 @@ func (s *statsTracker) savedByPeriod(prices map[string]ModelPrice) (dailySaved m
 	return
 }
 
-// Account 一个日日新账号（一个 API Key 及其已开通的模型）
+// Account 一个上游账号（一个 API Key 及其已开通的模型）
 type Account struct {
 	Alias     string   `json:"alias"`
 	ApiKey    string   `json:"api_key"`
@@ -450,7 +450,7 @@ func applyDefaults(cfg *Config) {
 		cfg.Listen = "127.0.0.1:18888"
 	}
 	if cfg.UpstreamBase == "" {
-		cfg.UpstreamBase = "https://token.sensenova.cn/v1"
+		cfg.UpstreamBase = "https://api.example.com/v1"
 	}
 	if cfg.TimeoutSeconds <= 0 {
 		cfg.TimeoutSeconds = 60
@@ -793,7 +793,7 @@ const autoModelID = "auto"
 // isImageModel 判断模型是否为图像生成模型（走 /v1/images 接口，不参与对话 Auto 选择）
 func isImageModel(model string) bool {
 	switch model {
-	case "sensenova-u1-fast", "sensenova-u1.5-lite":
+	case "u1-fast", "u1.5-lite":
 		return true
 	}
 	return false
@@ -1335,7 +1335,7 @@ func (g *Gateway) forwardOneModel(w http.ResponseWriter, r *http.Request, upstre
 
 		// 404 模型不存在 -> 说明该模型无法服务当前接口。
 		// 在 Auto 模式下应切换下一个候选模型，而不是把错误直接透传给客户端。
-		// 例如图像模型 sensenova-u1-fast / u1.5-lite 走 /chat/completions 时上游返回 404。
+		// 例如图像模型 u1-fast / u1.5-lite 走 /chat/completions 时上游返回 404。
 		if resp.StatusCode == 404 {
 			g.markCallEnd(ai, model)
 			g.stats.record("fail")
@@ -1610,7 +1610,7 @@ func (g *Gateway) handleModels(w http.ResponseWriter, _ *http.Request) {
 	g.mu.RUnlock()
 	data := make([]map[string]interface{}, 0, len(models))
 	for _, m := range models {
-		data = append(data, map[string]interface{}{"id": m, "object": "model", "owned_by": "sensenova"})
+		data = append(data, map[string]interface{}{"id": m, "object": "model", "owned_by": "upstream"})
 	}
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(map[string]interface{}{"object": "list", "data": data})
@@ -1709,7 +1709,7 @@ func (g *Gateway) handleHealth(w http.ResponseWriter, _ *http.Request) {
 func (g *Gateway) handleRoot(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(map[string]interface{}{
-		"name":    "日日新多账号网关",
+		"name":    "多账号 AI 网关",
 		"version": "1.1.0",
 		"endpoints": []string{
 			"POST /v1/chat/completions",
@@ -1951,7 +1951,7 @@ func main() {
 	mux.HandleFunc("/admin/restart", handleRestart)
 	mux.HandleFunc("/", g.handleRoot)
 
-	log.Printf("日日新多账号网关启动: http://%s  (上游 %s)", cfg.Listen, cfg.UpstreamBase)
+	log.Printf("多账号 AI 网关启动: http://%s  (上游 %s)", cfg.Listen, cfg.UpstreamBase)
 	log.Printf("已注册账号 %d 个，模型 %d 个: %s", len(cfg.Accounts), len(modelSet(cfg)), strings.Join(modelSet(cfg), ", "))
 	log.Printf("配置管理页面: http://%s/admin", cfg.Listen)
 	srv = &http.Server{Addr: cfg.Listen, Handler: logging(cors(mux))}

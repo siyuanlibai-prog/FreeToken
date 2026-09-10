@@ -1,3 +1,3 @@
-module sensenova-gateway
+module freetoken-gateway
 
 go 1.21
